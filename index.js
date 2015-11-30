@@ -6,16 +6,19 @@ var chalk = require('chalk');
 
 function errorFormat(msg) {
   return chalk.bold(chalk.red(msg));
-};
+}
 
 function main(callback, loader, sourcePath) {
-  fs.unlink('elm.js', function () {
+  //TODO: config-ify the temp directory
+  fs.unlink('/tmp/elm.js', function () {
     compileApp(callback, loader, sourcePath);
   });
 }
 
 function compileApp(callback, loader, sourcePath) {
-  var make = spawn('elm-make', ['--output', 'elm.js', sourcePath], {stdio: [process.stdin, process.stdout, 'pipe']});
+  //TODO: this must already be available in loader-utils somewhere?
+  var cwd = sourcePath.match(/(.*\/)[\w\-\.]*$/)[1];
+  var make = spawn('elm-make', ['--output', '/tmp/elm.js', sourcePath], {cwd: cwd, stdio: [process.stdin, process.stdout, 'pipe']});
   var weErrored = false;
   var errors = '';
 
@@ -41,7 +44,8 @@ function compileApp(callback, loader, sourcePath) {
 }
 
 function handleNormalClose(callback, loader) {
-  fs.readFile('elm.js', function (err, data) {
+  //TODO: config-ify the temp directory
+  fs.readFile('/tmp/elm.js', function (err, data) {
     if (err) throw err;
     var output = '' + data + '\n' + 'module.exports = Elm;';
     callback(null, output);

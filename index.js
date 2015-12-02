@@ -58,7 +58,7 @@ module.exports = function (source) {
 
   this.cacheable();
   this.addDependency(sourcePath);
-  this.addDependencyContext(sourcePath);
+  this.addContextDependency(path.dirname(sourcePath));
 
   if (!callback) {
     throw "can't handle non-async compilation. sorry.";
